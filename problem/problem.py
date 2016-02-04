@@ -26,8 +26,8 @@ def findEmptyPlace(position, board):
         col = pos%8
         row = math.floor(pos/8)
         if board[row][col] == 0:
-            return (pos, board)
-    return (False, board)
+            return (True, pos)
+    return (False, position)
 def showBoard(board):
     for i in list(range(0,8)):
             print("%d %d %d %d %d %d %d %d\n" % (board[i][0], board[i][1], board[i][2], board[i][3], board[i][4], board[i][5], board[i][6], board[i][7]))
@@ -35,11 +35,11 @@ def putQueen(queens, board):
     print("finding first legal position, and putting queen there.")
     queens = queens + 1
     if queens <= 8:
-        position = 0
+        position = -1
         #find first empty space
         while True:
-            (position, board) = findEmptyPlace(position, board)
-            if position == False:
+            (success, position) = findEmptyPlace(position, board)
+            if success == False:
                 break
             legality = determineLegality(position, board)
             if legality == True:
@@ -56,12 +56,12 @@ showBoard(squares)
 while True:
     print("press enter to add queen")
     #input()
-    if queens == 0:
+    '''if queens == 0:
         squares[0][0] = 1
         occupiedSquares.append(0)
         showBoard(squares)
         queens = 1
-        continue
+        continue'''
     (trial, squares) = putQueen(queens, squares)
     if trial == False:
         showBoard(squares)

@@ -1,6 +1,7 @@
 import math
 queens = 0
 occupiedSquares = []
+blacklistedSquares = []
 
 def getIllegalSquares(occu):
     illegals = []
@@ -15,6 +16,13 @@ def getIllegalSquares(occu):
         for iter in list(range(-7, 15)):
             if 0 < (8 * (row + iter) + (col + iter)) < 64:
                 illegals.append(8 * (row + iter) + (col + iter))
+        #other diagonal
+        for iter in list(range(-7, 15)):
+            if 0 < (8 * (row - iter) + (col + iter)) < 64:
+                illegals.append(8 * (row - iter) + (col + iter))
+        #blacklisted
+        for iter in blacklistedSquares:
+            illegals.append(iter)
     return illegals
 
 def determineLegality(position, board):
@@ -47,6 +55,14 @@ def putQueen(square, board):
     occupiedSquares.append(square)
     return (True, board)
 
+def popQueen(square, board):
+    print("removing queen from square %d" % square)
+    col = square%8
+    row = math.floor(square/8)
+    board[row][col] = 0
+    showBoard(board)
+    return board
+
 squares = [[0 for x in range(8)] for x in range(8)]
 print("initial board:\n")
 showBoard(squares)
@@ -56,16 +72,20 @@ while len(occupiedSquares) < 8:
     print("finding next empty square...")
     (success, nextEmptySquare) = findEmptyPlace(currentPos, squares)
     if success == False:
-        print("out of empty squares!")
-        #backtrack here
-        break
+        print("out of empty squares!\nbacktracking...")
+        blacklistedSquares.append(occupiedSquares.pop(len(occupiedSquares) - 1))
+        if len(occupiedSquares) == 0:
+            currentPos = -1
+        else:
+            currentPos = occupiedSquares[len(occupiedSquares) - 1]
+        squares = popQueen(blacklistedSquares[len(blacklistedSquares) - 1], squares)
+        continue
     print("found square number %d..." % nextEmptySquare)
     (success, squares) = putQueen(nextEmptySquare, squares)
     if success == True:
         currentPos = nextEmptySquare
         showBoard(squares)
         continue
-    showBoard(squares)
     print("illegal square so moving on")
     currentPos = nextEmptySquare
     continue

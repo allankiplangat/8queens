@@ -1,6 +1,7 @@
 import math
 queens = 0
 occupiedSquares = []
+
 def getIllegalSquares(occu):
     illegals = []
     for place in occu:
@@ -15,12 +16,13 @@ def getIllegalSquares(occu):
             if 0 < (8 * (row + iter) + (col + iter)) < 64:
                 illegals.append(8 * (row + iter) + (col + iter))
     return illegals
+
 def determineLegality(position, board):
-    #how to do this?
     illegalSquares = getIllegalSquares(occupiedSquares)
     if illegalSquares.count(position) == 0:
         return True
     return False
+
 def findEmptyPlace(position, board):
     for pos in list(range(position + 1, 64)):
         col = pos%8
@@ -28,44 +30,42 @@ def findEmptyPlace(position, board):
         if board[row][col] == 0:
             return (True, pos)
     return (False, position)
+
 def showBoard(board):
     for i in list(range(0,8)):
             print("%d %d %d %d %d %d %d %d\n" % (board[i][0], board[i][1], board[i][2], board[i][3], board[i][4], board[i][5], board[i][6], board[i][7]))
-def putQueen(queens, board):
-    print("finding first legal position, and putting queen there.")
-    queens = queens + 1
-    if queens <= 8:
-        position = -1
-        #find first empty space
-        while True:
-            (success, position) = findEmptyPlace(position, board)
-            if success == False:
-                break
-            legality = determineLegality(position, board)
-            if legality == True:
-                col = position%8
-                row = math.floor(position/8)
-                board[row][col] = 1
-                occupiedSquares.append(position)
-                return (queens, board)
-    return (False, board)
+
+def putQueen(square, board):
+    legal = determineLegality(square, board)
+    if legal == False:
+        print("square %d is illegal!" % square)
+        return (False, board)
+    print("putting queen at square %d because it is legal" % square)
+    col = square%8
+    row = math.floor(square/8)
+    board[row][col] = 1
+    occupiedSquares.append(square)
+    return (True, board)
 
 squares = [[0 for x in range(8)] for x in range(8)]
 print("initial board:\n")
 showBoard(squares)
-while True:
-    print("press enter to add queen")
-    #input()
-    '''if queens == 0:
-        squares[0][0] = 1
-        occupiedSquares.append(0)
-        showBoard(squares)
-        queens = 1
-        continue'''
-    (trial, squares) = putQueen(queens, squares)
-    if trial == False:
-        showBoard(squares)
-        print("end")
+currentPos = -1
+nextEmptySquare = 0
+while len(occupiedSquares) < 8:
+    print("finding next empty square...")
+    (success, nextEmptySquare) = findEmptyPlace(currentPos, squares)
+    if success == False:
+        print("out of empty squares!")
+        #backtrack here
         break
-    queens = trial
+    print("found square number %d..." % nextEmptySquare)
+    (success, squares) = putQueen(nextEmptySquare, squares)
+    if success == True:
+        currentPos = nextEmptySquare
+        showBoard(squares)
+        continue
     showBoard(squares)
+    print("illegal square so moving on")
+    currentPos = nextEmptySquare
+    continue

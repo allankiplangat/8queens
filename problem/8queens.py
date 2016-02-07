@@ -1,7 +1,9 @@
 import math
+import os
+import time
+allReps = 0
 queens = 0
 occupiedSquares = []
-blacklistedSquares = []
 
 def getIllegalSquares(occu):
     illegals = []
@@ -14,15 +16,12 @@ def getIllegalSquares(occu):
             illegals.append(8*row + iter)
         #diagonal illegals
         for iter in list(range(-7, 15)):
-            if 0 < (8 * (row + iter) + (col + iter)) < 64:
+            if ((0 < (8 * (row + iter) + (col + iter)) < 64) and (((row + iter)*(col + iter)) >= 0)):
                 illegals.append(8 * (row + iter) + (col + iter))
         #other diagonal
         for iter in list(range(-7, 15)):
-            if 0 < (8 * (row - iter) + (col + iter)) < 64:
+            if ((0 < (8 * (row - iter) + (col + iter)) < 64) and (((row - iter)*(col + iter)) >= 0)):
                 illegals.append(8 * (row - iter) + (col + iter))
-        #blacklisted
-        for iter in blacklistedSquares:
-            illegals.append(iter)
     return illegals
 
 def determineLegality(position, board):
@@ -40,15 +39,16 @@ def findEmptyPlace(position, board):
     return (False, position)
 
 def showBoard(board):
-    for i in list(range(0,8)):
-            print("%d %d %d %d %d %d %d %d\n" % (board[i][0], board[i][1], board[i][2], board[i][3], board[i][4], board[i][5], board[i][6], board[i][7]))
+    os.system('cls')
+    for i in list(range(0,8)):        
+        print("%d %d %d %d %d %d %d %d\n" % (board[i][0], board[i][1], board[i][2], board[i][3], board[i][4], board[i][5], board[i][6], board[i][7]))
 
 def putQueen(square, board):
     legal = determineLegality(square, board)
     if legal == False:
-        print("square %d is illegal!" % square)
+        #print("square %d is illegal!" % square)
         return (False, board)
-    print("putting queen at square %d because it is legal" % square)
+    #print("putting queen at square %d because it is legal" % square)
     col = square%8
     row = math.floor(square/8)
     board[row][col] = 1
@@ -56,36 +56,37 @@ def putQueen(square, board):
     return (True, board)
 
 def popQueen(square, board):
-    print("removing queen from square %d" % square)
+    #print("removing queen from square %d" % square)
     col = square%8
     row = math.floor(square/8)
     board[row][col] = 0
-    showBoard(board)
     return board
 
 squares = [[0 for x in range(8)] for x in range(8)]
-print("initial board:\n")
-showBoard(squares)
+#print("initial board:\n")
+start = time.time()
 currentPos = -1
 nextEmptySquare = 0
 while len(occupiedSquares) < 8:
-    print("finding next empty square...")
+    allReps = allReps + 1
+    if allReps%10000 == 0:
+        showBoard(squares)
+    #print("finding next empty square...")
     (success, nextEmptySquare) = findEmptyPlace(currentPos, squares)
     if success == False:
-        print("out of empty squares!\nbacktracking...")
-        blacklistedSquares.append(occupiedSquares.pop(len(occupiedSquares) - 1))
-        if len(occupiedSquares) == 0:
-            currentPos = -1
-        else:
-            currentPos = occupiedSquares[len(occupiedSquares) - 1]
-        squares = popQueen(blacklistedSquares[len(blacklistedSquares) - 1], squares)
+        #print("out of empty squares!\nbacktracking...")
+        currentPos = occupiedSquares.pop()
+        squares = popQueen(currentPos, squares)
         continue
-    print("found square number %d..." % nextEmptySquare)
+    #print("found square number %d..." % nextEmptySquare)
     (success, squares) = putQueen(nextEmptySquare, squares)
     if success == True:
         currentPos = nextEmptySquare
-        showBoard(squares)
         continue
-    print("illegal square so moving on")
+    #print("illegal square so moving on")
     currentPos = nextEmptySquare
     continue
+showBoard(squares)
+stop = time.time()
+print(stop - start)
+print(allReps)

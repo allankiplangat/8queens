@@ -64,9 +64,9 @@ def popQueen(square, board):
 
 squares = [[0 for x in range(8)] for x in range(8)]
 #print("initial board:\n")
-start = time.time()
 currentPos = -1
 nextEmptySquare = 0
+start = time.time()
 while len(occupiedSquares) < 8:
     allReps = allReps + 1
     #if allReps%10000 == 0:
@@ -86,7 +86,7 @@ while len(occupiedSquares) < 8:
     #print("illegal square so moving on")
     currentPos = nextEmptySquare
     continue
-showBoard(squares)
 stop = time.time()
+showBoard(squares)
 print(stop - start)
 print(allReps)

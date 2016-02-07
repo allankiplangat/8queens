@@ -69,8 +69,8 @@ currentPos = -1
 nextEmptySquare = 0
 while len(occupiedSquares) < 8:
     allReps = allReps + 1
-    if allReps%10000 == 0:
-        showBoard(squares)
+    #if allReps%10000 == 0:
+    #    showBoard(squares)
     #print("finding next empty square...")
     (success, nextEmptySquare) = findEmptyPlace(currentPos, squares)
     if success == False:
